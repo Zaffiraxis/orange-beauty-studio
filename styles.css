@@ -187,7 +187,7 @@ section{ position:relative; }
 .master:hover .pic img{ transform: scale(1.05); }
 .master .pic .tag{ position:absolute; left:14px; bottom:14px; background: color-mix(in oklab, var(--surface) 92%, transparent); backdrop-filter: blur(6px); border-radius: var(--radius-pill); padding:7px 14px; font-size:12.5px; font-weight:600; color:var(--accent); }
 .master h3{ font-size: 25px; margin: 18px 0 6px; }
-.master p{ color: var(--muted); font-size: 15px; margin:0; }
+.master p{ color: var(--ink); font-size: 15px; margin:0; }
 
 /* ---------- gallery (masonry) ---------- */
 .gallery{ columns: 4; column-gap: 16px; }
@@ -337,6 +337,7 @@ section{ position:relative; }
   grid-template-columns: repeat(2, 1fr);
   gap: clamp(28px, 4vw, 52px) clamp(24px, 3vw, 48px);
 }
+.prostir-cards{ background: #fff; }
 .pcard-wrap{ display:flex; flex-direction:column; align-items:center; }
 .pcard-frame{
   position:relative; width:100%; max-width:260px;
@@ -378,11 +379,11 @@ section{ position:relative; }
   white-space:nowrap;
 }
 .pcard-title{
-  font-size:22px; color:#fff; margin-bottom:8px; text-align:center;
+  font-size:22px; color: var(--ink); margin-bottom:8px; text-align:center;
   font-family: var(--font-display);
 }
 .pcard-desc{
-  font-size:14.5px; color:rgba(255,255,255,.72); text-align:center;
+  font-size:14.5px; color: var(--muted); text-align:center;
   line-height:1.6; max-width:28ch; margin:0;
 }
 .pcard-dots{
@@ -390,11 +391,11 @@ section{ position:relative; }
 }
 .pcard-dot{
   width:6px; height:6px; border-radius:50%;
-  background:rgba(255,255,255,.35);
+  background:rgba(0,0,0,.2);
   transition: background .3s;
   cursor:pointer;
 }
-.pcard-dot.active{ background:#fff; }
+.pcard-dot.active{ background: var(--accent); }
 
 @media (max-width:760px){
   .prostir-grid{ grid-template-columns: 1fr 1fr; gap:20px 16px; }
