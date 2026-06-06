@@ -32,73 +32,92 @@ if (window.matchMedia('(max-width: 640px)').matches) {
   document.body.classList.add('has-callbar');
 }
 
-// Lightbox
-var LB = {
-  el: null, img: null, items: [], idx: 0,
-  init: function(){
-    this.el  = document.getElementById('lb');
-    this.img = document.getElementById('lbImg');
-    if(!this.el) return;
-    document.getElementById('lbClose').onclick = function(){ LB.hide(); };
-    document.getElementById('lbPrev').onclick  = function(){ LB.step(-1); };
-    document.getElementById('lbNext').onclick  = function(){ LB.step(1); };
-    this.el.addEventListener('click', function(e){ if(e.target === LB.el) LB.hide(); });
-    document.addEventListener('keydown', function(e){
-      if(!LB.el.classList.contains('open')) return;
-      if(e.key==='Escape') LB.hide();
-      if(e.key==='ArrowLeft')  LB.step(-1);
-      if(e.key==='ArrowRight') LB.step(1);
-    });
-  },
-  show: function(arr, i){
-    this.items = arr; this.idx = i;
-    this.img.src = arr[i];
-    document.getElementById('lbPrev').style.display = arr.length > 1 ? '' : 'none';
-    document.getElementById('lbNext').style.display = arr.length > 1 ? '' : 'none';
-    this.el.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  },
-  hide: function(){
-    this.el.classList.remove('open');
-    document.body.style.overflow = '';
-    this.img.src = '';
-  },
-  step: function(dir){
-    this.idx = (this.idx + dir + this.items.length) % this.items.length;
-    this.img.src = this.items[this.idx];
-  }
-};
-LB.init();
+// ── Lightbox ──────────────────────────────────────────
+var lbEl   = document.getElementById('lb');
+var lbImg  = document.getElementById('lbImg');
+var lbPrev = document.getElementById('lbPrev');
+var lbNext = document.getElementById('lbNext');
+var lbItems = [], lbIdx = 0;
 
-// Галерея — клік відкриває лайтбокс
-var galleryLinks = Array.prototype.slice.call(document.querySelectorAll('.gallery .ph'));
-var galleryUrls  = galleryLinks.map(function(a){ return a.getAttribute('href'); });
-galleryLinks.forEach(function(a, i){
-  a.addEventListener('click', function(e){
-    e.preventDefault();
-    LB.show(galleryUrls, i);
-  });
+function lbShow(arr, i){
+  lbItems = arr; lbIdx = i;
+  lbImg.src = arr[i];
+  lbPrev.style.display = arr.length > 1 ? '' : 'none';
+  lbNext.style.display = arr.length > 1 ? '' : 'none';
+  lbEl.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function lbHide(){
+  lbEl.classList.remove('open');
+  document.body.style.overflow = '';
+  lbImg.src = '';
+}
+function lbStep(d){
+  lbIdx = (lbIdx + d + lbItems.length) % lbItems.length;
+  lbImg.src = lbItems[lbIdx];
+}
+
+if(lbEl){
+  document.getElementById('lbClose').addEventListener('click', lbHide);
+  lbPrev.addEventListener('click', function(){ lbStep(-1); });
+  lbNext.addEventListener('click', function(){ lbStep(1); });
+  lbEl.addEventListener('click', function(e){ if(e.target === lbEl) lbHide(); });
+}
+document.addEventListener('keydown', function(e){
+  if(!lbEl || !lbEl.classList.contains('open')) return;
+  if(e.key === 'Escape')      lbHide();
+  if(e.key === 'ArrowLeft')   lbStep(-1);
+  if(e.key === 'ArrowRight')  lbStep(1);
 });
 
-// Фото майстрів — клік відкриває лайтбокс
+// ── Галерея ───────────────────────────────────────────
+var galleryEl = document.querySelector('.gallery');
+if(galleryEl){
+  var galleryLinks = Array.prototype.slice.call(galleryEl.querySelectorAll('.ph'));
+  var galleryUrls  = galleryLinks.map(function(a){ return a.getAttribute('href'); });
+  galleryEl.addEventListener('click', function(e){
+    var link = e.target.closest('.ph');
+    if(!link) return;
+    e.preventDefault();
+    var i = galleryLinks.indexOf(link);
+    lbShow(galleryUrls, i >= 0 ? i : 0);
+  });
+}
+
+// ── Фото майстрів ─────────────────────────────────────
 document.querySelectorAll('.master .pic').forEach(function(pic){
   var img = pic.querySelector('img');
   if(!img) return;
   pic.style.cursor = 'pointer';
   pic.addEventListener('click', function(){
-    LB.show([img.src.replace('w_600','w_1200')], 0);
+    lbShow([img.src.replace('w_600','w_1200')], 0);
   });
 });
 
-// Відео — повноекранний режим по кліку
+// ── Картки "Наш простір" ──────────────────────────────
+document.querySelectorAll('.pcard-wrap').forEach(function(card){
+  var shots = Array.prototype.slice.call(card.querySelectorAll('.pshot'));
+  if(!shots.length) return;
+  var urls = shots.map(function(s){ return s.src.replace('w_600','w_1200'); });
+  var frame = card.querySelector('.pcard-frame');
+  if(frame){
+    frame.style.cursor = 'pointer';
+    frame.addEventListener('click', function(){
+      var activeIdx = shots.findIndex(function(s){ return s.classList.contains('active'); });
+      lbShow(urls, activeIdx >= 0 ? activeIdx : 0);
+    });
+  }
+});
+
+// ── Відео — повноекранний режим ───────────────────────
 var vid = document.querySelector('.prostir-video-wrap video');
 if(vid){
   vid.style.cursor = 'pointer';
   vid.title = 'Натисніть для повноекранного перегляду';
   vid.addEventListener('click', function(){
-    if(vid.requestFullscreen) vid.requestFullscreen();
+    if(vid.requestFullscreen)          vid.requestFullscreen();
     else if(vid.webkitRequestFullscreen) vid.webkitRequestFullscreen();
-    else if(vid.mozRequestFullScreen) vid.mozRequestFullScreen();
+    else if(vid.mozRequestFullScreen)    vid.mozRequestFullScreen();
   });
 }
 
